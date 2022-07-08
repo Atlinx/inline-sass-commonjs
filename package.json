@@ -1,27 +1,40 @@
 {
-    "name": "inline-sass-commonjs",
-    "version": "1.0.0",
-    "description": "",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "main": "index.js",
-    "author": {
-        "name": "Atlinx",
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Atlinx/inline-sass-commonjs" 
-    },
-    "homepage": "https://github.com/Atlinx/inline-sass-commonjs",
-    "license": "GPL-3.0",
-    "dependencies": {
-        "inline-css": "^3.0.0",
-        "node-html-parser": "^5.0.0",
-        "sass": "^1.43.2"
-    },
-    "devDependencies": {
-        "eslint": "^8.1.0",
-        "prettier": "^2.4.1"
-    }
+  "name": "inline-sass-commonjs",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \" src/**/*.js\"",
+    "prepare": "npm run build",
+    "postversion": "git push && git push --tags"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "author": {
+    "name": "Atlinx"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Atlinx/inline-sass-commonjs"
+  },
+  "homepage": "https://github.com/Atlinx/inline-sass-commonjs",
+  "bugs": {
+    "url": "https://github.com/Atlinx/inline-sass-commonjs/issues"
+  },
+  "files": [
+    "lib/**/*"
+  ],
+  "license": "GPL-3.0",
+  "dependencies": {
+    "inline-css": "^3.0.0",
+    "node-html-parser": "^5.0.0",
+    "sass": "^1.43.2"
+  },
+  "devDependencies": {
+    "@types/inline-css": "^3.0.1",
+    "@types/node": "^18.0.3",
+    "prettier": "^2.4.1",
+    "typescript": "^4.7.4"
+  }
 }
