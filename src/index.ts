@@ -9,17 +9,15 @@ const defaultsOptions = {
   deleteTempDir: true
 };
 
-export type Options = inlineCSS.Options & {
-  deleteTempDir: true;
+type MakeOptional<Type, Key extends keyof Type> = Omit<Type, Key> &
+  Partial<Pick<Type, Key>>;
+
+export type Options = MakeOptional<inlineCSS.Options, 'url'> & {
+  deleteTempDir?: boolean;
 };
 
-const inlineSass = async (path_or_html: string, options: Options) => {
+const inlineSass = async (path_or_html: string, options: Options = {}) => {
   options = { ...defaultsOptions, ...options };
-  let html = path_or_html;
-  let dir =
-    options.url.search(/^file:\/\//) === 0
-      ? options.url.replace(/^file:\/\//, '')
-      : undefined;
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'css-'));
 
   const transpileSass = (dom: HTMLElement, base: string) => {
@@ -37,6 +35,7 @@ const inlineSass = async (path_or_html: string, options: Options) => {
         tmp,
         path.basename(path.basename(href, '.sass'), '.scss') + '.css'
       );
+      cssFile = cssFile.replace(/\\/g, '/');
       fs.writeFileSync(cssFile, sass.compile(sassFile).css);
       link.setAttribute('href', `file://${cssFile}`);
       link.setAttribute('data-original-href', href);
@@ -44,6 +43,11 @@ const inlineSass = async (path_or_html: string, options: Options) => {
     return dom;
   };
 
+  let dir: string | undefined = undefined;
+  if (options.url && options.url.search(/^file:\/\//) === 0)
+    dir = options.url.replace(/^file:\/\//, '');
+
+  let html = path_or_html;
   if (fs.existsSync(path_or_html)) {
     html = fs.readFileSync(path_or_html).toString();
     dir = path.dirname(path_or_html);
@@ -58,11 +62,18 @@ const inlineSass = async (path_or_html: string, options: Options) => {
     }
   }
 
-  dom = transpileSass(dom, dir || options.url.replace(/(^\w+:\/\/)/, ''));
+  dir = dir?.replace(/\\/g, '/');
+  dom = transpileSass(
+    dom,
+    dir || (options.url?.replace(/(^\w+:\/\/)/, '') ?? '')
+  );
 
   let result = undefined;
   try {
-    result = await inlineCSS(String(dom), options);
+    result = await inlineCSS(String(dom), {
+      url: `file://${dir}/`,
+      ...options
+    });
   } catch (e) {
     console.log(e);
   }
